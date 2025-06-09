@@ -10,8 +10,8 @@ import java.lang.annotation.Target;
  *
  * @author whliu
  */
-@Target(ElementType.METHOD)
-@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.METHOD) // 指定注解可以应用在哪些元素上（这里指定方法）
+@Retention(RetentionPolicy.RUNTIME) // 指定注解在什么阶段保留（这里指定运行时保留）
 public @interface AuthCheck {
 
     /**
@@ -19,14 +19,14 @@ public @interface AuthCheck {
      *
      * @return
      */
-    String[] anyRole() default "";
+    String[] anyRole() default ""; // 可选描述信息，默认值是空字符串
 
     /**
      * 必须有某个角色
      *
      * @return
      */
-    String mustRole() default "";
+    String mustRole() default ""; // 可选描述信息
 
 }
 

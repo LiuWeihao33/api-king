@@ -2,18 +2,19 @@ package com.whliu.project.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.google.gson.Gson;
+import com.whliu.apikingclientsdk.client.ApiKingClient;
 import com.whliu.project.annotation.AuthCheck;
-import com.whliu.project.common.BaseResponse;
-import com.whliu.project.common.DeleteRequest;
-import com.whliu.project.common.ErrorCode;
-import com.whliu.project.common.ResultUtils;
+import com.whliu.project.common.*;
 import com.whliu.project.constant.CommonConstant;
 import com.whliu.project.exception.BusinessException;
 import com.whliu.project.model.dto.interfaceInfo.InterfaceInfoAddRequest;
+import com.whliu.project.model.dto.interfaceInfo.InterfaceInfoInvokeRequest;
 import com.whliu.project.model.dto.interfaceInfo.InterfaceInfoQueryRequest;
 import com.whliu.project.model.dto.interfaceInfo.InterfaceInfoUpdateRequest;
 import com.whliu.project.model.entity.InterfaceInfo;
 import com.whliu.project.model.entity.User;
+import com.whliu.project.model.enums.InterfaceInfoStatusEnum;
 import com.whliu.project.service.InterfaceInfoService;
 import com.whliu.project.service.UserService;
 import lombok.extern.slf4j.Slf4j;
@@ -26,7 +27,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 /**
- * 帖子接口
+ * 接口管理
  *
  * @author whliu
  */
@@ -40,6 +41,9 @@ public class InterfaceInfoController {
 
     @Resource
     private UserService userService;
+
+    @Resource
+    private ApiKingClient apiKingClient;
 
     // region 增删改查
 
@@ -195,5 +199,110 @@ public class InterfaceInfoController {
     }
 
     // endregion
+
+    /**
+     * 发布
+     *
+     * @param idRequest
+     * @param request
+     * @return
+     */
+    @PostMapping("/online")
+    @AuthCheck(mustRole = "admin") // 该接口仅管理员可用
+    public BaseResponse<Boolean> onlineInterfaceInfo(@RequestBody IdRequest idRequest,
+                                                     HttpServletRequest request) {
+        if (idRequest == null || idRequest.getId() <= 0) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+        // 1.判断该接口是否存在
+        Long id = idRequest.getId();
+        InterfaceInfo oldInterfaceInfo = interfaceInfoService.getById(id);
+        // 如果查询结果为空
+        if (oldInterfaceInfo == null) {
+            throw new BusinessException(ErrorCode.NOT_FOUND_ERROR); // 抛出业务异常，表示未找到数据
+        }
+        // 2. 判断该接口是否可以调用
+        com.whliu.apikingclientsdk.model.User user = new com.whliu.apikingclientsdk.model.User();
+        user.setUsername("test");
+        String username = apiKingClient.getUserNameByPost(user);
+        if (StringUtils.isBlank(username)) {
+            throw new BusinessException(ErrorCode.SYSTEM_ERROR, "接口验证失败");
+        }
+        InterfaceInfo interfaceInfo = new InterfaceInfo();
+        interfaceInfo.setId(id);
+        // 3. 修改数据库中的状态字段为上线
+        interfaceInfo.setStatus(InterfaceInfoStatusEnum.ONLINE.getValue());
+        // 调用interfaceInfoService的updateById方法，传入interfaceInfo对象，并将返回的结果赋值给result变量
+        boolean result = interfaceInfoService.updateById(interfaceInfo);
+        return ResultUtils.success(result);
+    }
+
+    /**
+     * 下线
+     *
+     * @param idRequest
+     * @param request
+     * @return
+     */
+    @PostMapping("/offline")
+    @AuthCheck(mustRole = "admin") // 该接口仅管理员可用
+    public BaseResponse<Boolean> offlineInterfaceInfo(@RequestBody IdRequest idRequest,
+                                                     HttpServletRequest request) {
+        if (idRequest == null || idRequest.getId() <= 0) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+        // 1.判断该接口是否存在
+        Long id = idRequest.getId();
+        InterfaceInfo oldInterfaceInfo = interfaceInfoService.getById(id);
+        // 如果查询结果为空
+        if (oldInterfaceInfo == null) {
+            throw new BusinessException(ErrorCode.NOT_FOUND_ERROR); // 抛出业务异常，表示未找到数据
+        }
+        InterfaceInfo interfaceInfo = new InterfaceInfo();
+        interfaceInfo.setId(id);
+        // 2. 修改数据库中的状态字段为上线
+        interfaceInfo.setStatus(InterfaceInfoStatusEnum.OFFLINE.getValue());
+        // 调用interfaceInfoService的updateById方法，传入interfaceInfo对象，并将返回的结果赋值给result变量
+        boolean result = interfaceInfoService.updateById(interfaceInfo);
+        return ResultUtils.success(result);
+    }
+
+    /**
+     * 下线
+     *
+     * @param interfaceInfoInvokeRequest
+     * @param request
+     * @return
+     */
+    @PostMapping("/invoke")
+    // 这里给他重新封装一个参数InterfaceInfoInvokeRequest
+    // 返回结果把对象发出去好了，因为不确定接口的返回值到底是什么
+    public BaseResponse<Object> invokeInterfaceInfo(@RequestBody InterfaceInfoInvokeRequest interfaceInfoInvokeRequest,
+                                                      HttpServletRequest request) {
+        if (interfaceInfoInvokeRequest == null || interfaceInfoInvokeRequest.getId() <= 0) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+        // 1.判断该接口是否存在
+        Long id = interfaceInfoInvokeRequest.getId();
+        // 获取用户请求参数
+        String userRequestParams = interfaceInfoInvokeRequest.getRequestParams();
+        // 判断是否存在
+        InterfaceInfo oldInterfaceInfo = interfaceInfoService.getById(id);
+        if (oldInterfaceInfo == null) {
+            throw new BusinessException(ErrorCode.NOT_FOUND_ERROR); // 抛出业务异常，表示未找到数据
+        }
+        if (oldInterfaceInfo.getStatus() == InterfaceInfoStatusEnum.OFFLINE.getValue()) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "接口已关闭");
+        }
+        User loginUser = userService.getLoginUser(request);
+        String accessKey = loginUser.getAccessKey();
+        String secretKey = loginUser.getSecretKey();
+        // 创建一个临时的apiKingClient对象，传入ak、sk
+        ApiKingClient tempClient = new ApiKingClient(accessKey, secretKey);
+        Gson gson = new Gson();
+        com.whliu.apikingclientsdk.model.User user = gson.fromJson(userRequestParams, com.whliu.apikingclientsdk.model.User.class);
+        String userNameByPost = tempClient.getUserNameByPost(user);
+        return ResultUtils.success(userNameByPost);
+    }
 
 }

@@ -41,10 +41,12 @@ public class AuthInterceptor {
      * @param authCheck
      * @return
      */
-    @Around("@annotation(authCheck)")
+    @Around("@annotation(authCheck)") // 定义一个环绕通知，拦截所有带有@AuthCheck注解的方法，authCheck参数会自动注入被拦截方法上的@AuthCheck注解实例
     public Object doInterceptor(ProceedingJoinPoint joinPoint, AuthCheck authCheck) throws Throwable {
         List<String> anyRole = Arrays.stream(authCheck.anyRole()).filter(StringUtils::isNotBlank).collect(Collectors.toList());
-        String mustRole = authCheck.mustRole();
+        String mustRole = authCheck.mustRole(); // 从注解中获取mustRole字符串
+        // 通过它获取HttpServletRequest对象，用于获取请求相关信息
+        // 通过它获取HttpServletRequest对象，用于获取请求相关信息
         RequestAttributes requestAttributes = RequestContextHolder.currentRequestAttributes();
         HttpServletRequest request = ((ServletRequestAttributes) requestAttributes).getRequest();
         // 当前登录用户
