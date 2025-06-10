@@ -1,0 +1,7 @@
+curl -X POST \
+  -H "accessKey: whliu" \
+  -H "nonce: 1111" \
+  -H "timestamp: 1111" \
+  -H "sign: abcdefg" \
+  -H "body: aaaa" \
+  "http://127.0.0.1:8090/api/name/get?name=whliu?accessKey=whliu"
