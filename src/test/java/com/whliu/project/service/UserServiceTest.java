@@ -1,6 +1,6 @@
 package com.whliu.project.service;
 
-import com.whliu.project.model.entity.User;
+import com.whliu.apikingcommon.model.entity.User;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

@@ -2,7 +2,7 @@ package com.whliu.project.service;
 
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.whliu.project.model.entity.User;
+import com.whliu.apikingcommon.model.entity.User;
 
 import javax.servlet.http.HttpServletRequest;
 

@@ -1,7 +1,7 @@
 package com.whliu.project.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.whliu.project.model.entity.InterfaceInfo;
+import com.whliu.apikingcommon.model.entity.InterfaceInfo;
 
 /**
 * @author king

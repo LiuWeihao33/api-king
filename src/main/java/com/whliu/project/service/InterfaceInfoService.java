@@ -1,7 +1,7 @@
 package com.whliu.project.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.whliu.project.model.entity.InterfaceInfo;
+import com.whliu.apikingcommon.model.entity.InterfaceInfo;
 
 /**
 * @author king

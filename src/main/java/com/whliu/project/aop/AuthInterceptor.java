@@ -1,10 +1,10 @@
 package com.whliu.project.aop;
 
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
+import com.whliu.apikingcommon.model.entity.User;
 import com.whliu.project.annotation.AuthCheck;
 import com.whliu.project.common.ErrorCode;
 import com.whliu.project.exception.BusinessException;
-import com.whliu.project.model.entity.User;
 import com.whliu.project.service.UserService;
 import org.apache.commons.lang3.StringUtils;
 import org.aspectj.lang.ProceedingJoinPoint;

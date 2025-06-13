@@ -1,9 +1,9 @@
 package com.whliu.project.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.whliu.apikingcommon.model.entity.InterfaceInfo;
 import com.whliu.project.common.ErrorCode;
 import com.whliu.project.exception.BusinessException;
-import com.whliu.project.model.entity.InterfaceInfo;
 import com.whliu.project.mapper.InterfaceInfoMapper;
 import com.whliu.project.service.InterfaceInfoService;
 import org.apache.commons.lang3.StringUtils;
