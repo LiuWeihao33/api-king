@@ -22,21 +22,21 @@ public class NameController {
 
     @PostMapping("/user")
     public String getUserNameByPost(@RequestBody User user, HttpServletRequest request){
-        String accessKey = request.getHeader("accessKey");
-        String nonce = request.getHeader("nonce");
-        String timestamp = request.getHeader("timestamp");
-        String signature = request.getHeader("signature");
-        String body = request.getHeader("body");
-        if (!accessKey.equals("whliu")){
-            throw new RuntimeException("无权限");
-        }
-        // 校验随机数大小
-        if (Integer.parseInt(nonce) > 10000) {
-            throw new RuntimeException("无权限");
-        }
-
-        // todo 实际情况中是从数据库中获取secretKey
-        String serverSign = SignUtils.genSign(body, "abcdefg");
+//        String accessKey = request.getHeader("accessKey");
+//        String nonce = request.getHeader("nonce");
+//        String timestamp = request.getHeader("timestamp");
+//        String signature = request.getHeader("signature");
+//        String body = request.getHeader("body");
+//        if (!accessKey.equals("whliu")){
+//            throw new RuntimeException("无权限");
+//        }
+//        // 校验随机数大小
+//        if (Integer.parseInt(nonce) > 10000) {
+//            throw new RuntimeException("无权限");
+//        }
+//
+//        // todo 实际情况中是从数据库中获取secretKey
+//        String serverSign = SignUtils.genSign(body, "abcdefg");
 //        if (!serverSign.equals(signature)){
 //            throw new RuntimeException("无权限");
 //        }
